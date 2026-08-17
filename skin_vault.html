@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKIN VAULT</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06080f;--bg2:#0a0e18;--bg3:#10141f;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0e6d2;--muted:rgba(240,230,210,0.4);
+  --gold:#c89b3c;--gold-bright:#f0e6d2;--gold-dim:rgba(200,155,60,0.25);
+
+  /* rarity colors */
+  --r-common:#8a9bb0;
+  --r-epic:#1e90ff;
+  --r-legendary:#e84040;
+  --r-mythic:#a855f7;
+  --r-ultimate:#f4c550;
+  --r-exalted:#7ec87e;   /* gold-green */
+  --r-transcended:#b8a9e8; /* silver-purple */
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── NAV ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(6,8,15,0.96);border-bottom:1px solid var(--gold-dim);position:sticky;top:0;z-index:200;backdrop-filter:blur(12px);}
+.nav-brand{font-family:'Cinzel',serif;font-size:1.1em;letter-spacing:4px;color:var(--gold);text-decoration:none;}
+.nav-brand span{color:var(--muted);font-size:0.7em;margin-left:8px;letter-spacing:2px;}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.btn{padding:6px 14px;background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:0.8em;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+.btn:hover{color:var(--text);border-color:rgba(255,255,255,0.28);}
+.btn-gold{background:var(--gold);color:#06080f;border-color:var(--gold);font-weight:700;}
+.btn-gold:hover{background:#b8882a;border-color:#b8882a;color:#06080f;}
+
+/* ── STATS BAR ── */
+.stats-bar{display:flex;gap:0;border-bottom:1px solid var(--gold-dim);background:var(--bg2);overflow-x:auto;scrollbar-width:none;}
+.stat-chip{padding:10px 20px;display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--border);white-space:nowrap;flex-shrink:0;}
+.stat-chip-val{font-family:'Cinzel',serif;font-size:1.3em;font-weight:700;color:var(--gold);}
+.stat-chip-label{font-size:0.62em;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.owned-pct{background:rgba(200,155,60,0.08);}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;}
+.search-box{flex:1;min-width:180px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text);padding:7px 12px;font-family:'Rajdhani',sans-serif;font-size:0.9em;outline:none;transition:border-color 0.2s;}
+.search-box:focus{border-color:var(--gold);}
+.search-box::placeholder{color:var(--muted);}
+.filter-sel{background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--muted);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:0.82em;outline:none;cursor:pointer;transition:border-color 0.2s;}
+.filter-sel:focus{border-color:var(--gold);}
+.filter-sel option{background:var(--bg2);}
+.toggle-btn{padding:6px 12px;background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:0.78em;letter-spacing:1px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+.toggle-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(200,155,60,0.1);}
+
+/* ── MAIN LAYOUT ── */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 57px - 56px - 52px);}
+
+/* ── CHAMPION SIDEBAR ── */
+.champ-sidebar{border-right:1px solid var(--border);background:var(--bg2);overflow-y:auto;max-height:calc(100vh - 57px - 56px - 52px);position:sticky;top:calc(57px + 56px + 52px);}
+.champ-sidebar-hd{padding:10px 14px;font-size:0.62em;letter-spacing:3px;color:var(--gold);text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:5;}
+.champ-count{color:var(--muted);font-size:0.9em;}
+.champ-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s;}
+.champ-item:hover{background:rgba(200,155,60,0.06);}
+.champ-item.active{background:rgba(200,155,60,0.1);border-left:2px solid var(--gold);}
+.champ-item.all-item{font-size:0.82em;letter-spacing:1px;color:var(--muted);}
+.champ-item.all-item.active{color:var(--gold);}
+.champ-icon{width:28px;height:28px;border-radius:3px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+.champ-name-sidebar{font-size:0.82em;font-weight:600;}
+.champ-own-count{margin-left:auto;font-size:0.68em;color:var(--muted);font-family:'Cinzel',serif;}
+
+/* ── SKIN GRID ── */
+.skin-area{padding:20px;}
+.champ-section{margin-bottom:32px;}
+.champ-section-hd{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--gold-dim);}
+.champ-section-icon{width:44px;height:44px;border-radius:4px;border:2px solid var(--gold-dim);object-fit:cover;}
+.champ-section-name{font-family:'Cinzel',serif;font-size:1.1em;letter-spacing:3px;color:var(--gold);}
+.champ-section-stats{font-size:0.75em;color:var(--muted);margin-left:auto;}
+
+.skin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+
+/* skin card */
+.skin-card{background:var(--bg3);border:1px solid var(--border);position:relative;cursor:pointer;transition:all 0.2s;overflow:hidden;}
+.skin-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,0.5);}
+.skin-card.owned{border-color:rgba(110,231,160,0.5);box-shadow:0 0 8px rgba(110,231,160,0.2),inset 0 0 12px rgba(110,231,160,0.04);}
+.skin-card.owned:hover{box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 12px rgba(110,231,160,0.3);}
+.skin-card.owned::after{content:'✓';position:absolute;top:4px;right:4px;width:14px;height:14px;background:#6ee7a0;color:#0d0d0f;font-size:0.6em;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.skin-card.unavailable{border-color:rgba(240,112,112,0.4);box-shadow:0 0 8px rgba(240,112,112,0.15),inset 0 0 12px rgba(240,112,112,0.04);}
+.skin-card.unavailable:hover{box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 10px rgba(240,112,112,0.25);}
+.skin-card.worlds{border-color:rgba(250,215,80,0.5);box-shadow:0 0 10px rgba(250,215,80,0.18),inset 0 0 14px rgba(250,215,80,0.05);}
+.skin-card.worlds:hover{box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 14px rgba(250,215,80,0.3);}
+.worlds-badge{position:absolute;top:4px;left:4px;font-size:0.58em;letter-spacing:1px;padding:1px 5px;background:rgba(250,215,80,0.15);border:1px solid rgba(250,215,80,0.6);color:#fad750;text-transform:uppercase;font-weight:700;}
+
+.skin-splash{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top;display:block;background:var(--bg2);transition:transform 0.3s;}
+.skin-card:hover .skin-splash{transform:scale(1.04);}
+.skin-splash-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg2),var(--bg3));display:flex;align-items:center;justify-content:center;font-size:1.5em;opacity:0.2;}
+.skin-card.rarity-common{background:rgba(138,155,176,0.06);}
+.skin-card.rarity-epic{background:rgba(30,144,255,0.07);}
+.skin-card.rarity-legendary{background:rgba(232,64,64,0.07);}
+.skin-card.rarity-mythic{background:rgba(168,85,247,0.08);}
+.skin-card.rarity-ultimate{background:rgba(244,197,80,0.08);}
+.skin-card.rarity-exalted{background:rgba(126,200,126,0.07);}
+.skin-card.rarity-transcended{background:rgba(184,169,232,0.08);}
+
+.skin-info{padding:7px 9px;}
+.skin-name{font-size:0.84em;font-weight:600;margin-bottom:3px;line-height:1.2;}
+.skin-meta{display:flex;align-items:center;justify-content:space-between;gap:4px;}
+.rarity-badge{font-size:0.6em;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;white-space:nowrap;}
+.price-tag{font-size:0.65em;color:var(--muted);font-family:'Cinzel',serif;white-space:nowrap;}
+
+/* rarity colors */
+.r-common   {color:var(--r-common);border-color:var(--r-common) !important;}
+.r-epic     {color:var(--r-epic);border-color:var(--r-epic) !important;}
+.r-legendary{color:var(--r-legendary);border-color:var(--r-legendary) !important;}
+.r-mythic   {color:var(--r-mythic);border-color:var(--r-mythic) !important;}
+.r-ultimate {color:var(--r-ultimate);border-color:var(--r-ultimate) !important;}
+.r-exalted  {color:var(--r-exalted);border-color:var(--r-exalted) !important;}
+.r-transcended{color:var(--r-transcended);border-color:var(--r-transcended) !important;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--gold-dim);width:96%;max-width:580px;max-height:90vh;display:flex;flex-direction:column;animation:mIn 0.22s ease;}
+@keyframes mIn{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-family:'Cinzel',serif;font-size:0.9em;letter-spacing:3px;color:var(--gold);}
+.modal-x{background:transparent;border:none;color:var(--muted);font-size:1.1em;cursor:pointer;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:color 0.2s;}
+.modal-x:hover{color:var(--text);}
+.modal-bd{padding:20px;overflow-y:auto;flex:1;}
+.modal-ft{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
+
+.fg{margin-bottom:14px;}
+.fl{display:block;font-size:0.65em;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.fi,.fs{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-family:'Rajdhani',sans-serif;font-size:0.92em;outline:none;transition:border-color 0.2s;}
+.fi:focus,.fs:focus{border-color:var(--gold);}
+.fi::placeholder{color:var(--muted);}
+.fs option{background:var(--bg2);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* champ picker in modal */
+.champ-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px;max-height:240px;overflow-y:auto;padding:4px;}
+.cp-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border:1px solid transparent;transition:all 0.15s;border-radius:2px;}
+.cp-item:hover{background:rgba(200,155,60,0.08);border-color:var(--gold-dim);}
+.cp-item.selected{border-color:var(--gold);background:rgba(200,155,60,0.12);}
+.cp-icon{width:44px;height:44px;border-radius:3px;object-fit:cover;border:1px solid var(--border);}
+.cp-name{font-size:0.56em;text-align:center;color:var(--muted);line-height:1.1;word-break:break-word;}
+.cp-item.selected .cp-name{color:var(--gold);}
+.cp-search{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-family:'Rajdhani',sans-serif;font-size:0.85em;outline:none;margin-bottom:8px;}
+.cp-search:focus{border-color:var(--gold);}
+.cp-search::placeholder{color:var(--muted);}
+
+/* rarity picker */
+.rarity-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;}
+.rp-item{padding:7px 10px;border:1px solid var(--border2);cursor:pointer;font-size:0.75em;letter-spacing:1px;text-transform:uppercase;text-align:center;transition:all 0.15s;font-weight:700;}
+.rp-item:hover{filter:brightness(1.2);}
+.rp-item.selected{filter:brightness(1.3);box-shadow:0 0 10px currentColor;}
+
+/* owned toggle in modal */
+.owned-toggle{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border2);cursor:pointer;transition:all 0.2s;user-select:none;}
+.owned-toggle.active{border-color:var(--gold);background:rgba(200,155,60,0.08);}
+.owned-toggle input{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;}
+.owned-toggle-label{font-size:0.9em;font-weight:600;}
+
+.toast{position:fixed;bottom:18px;right:18px;background:var(--bg2);border:1px solid var(--gold-dim);padding:9px 16px;font-size:0.82em;z-index:9998;transform:translateY(50px);opacity:0;transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+.toast.show{transform:none;opacity:1;}
+.empty{padding:60px;text-align:center;color:var(--muted);font-size:0.9em;}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;}
+  .champ-sidebar{display:none;}
+  .toolbar{padding:10px 14px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="hub.html">⚡ NEXUS <span>/ SKIN VAULT</span></a>
+  <div class="nav-right">
+    <button class="btn" onclick="exportData()">📤 Export</button>
+    <button class="btn" onclick="document.getElementById('fileInput').click()">📥 Import</button>
+    <button class="btn btn-gold" onclick="openAddSkin()">+ Dodaj skin</button>
+    <input type="file" id="fileInput" accept=".json" onchange="importData(event)" style="display:none">
+  </div>
+</nav>
+
+<div class="stats-bar" id="stats-bar"></div>
+
+<div class="toolbar">
+  <input class="search-box" id="search-box" placeholder="🔍 Szukaj skina…" oninput="renderAll()">
+  <select class="filter-sel" id="filter-rarity" onchange="renderAll()">
+    <option value="">Wszystkie rzadkości</option>
+    <option value="common">Zwykły</option>
+    <option value="epic">Epicki</option>
+    <option value="legendary">Legendarny</option>
+    <option value="mythic">Mityczny</option>
+    <option value="ultimate">Ultimate</option>
+    <option value="exalted">Exalted</option>
+    <option value="transcended">Transcended</option>
+  </select>
+  <select class="filter-sel" id="filter-price" onchange="renderAll()">
+    <option value="">Wszystkie ceny</option>
+    <option value="390">390 RP</option>
+    <option value="520">520 RP</option>
+    <option value="750">750 RP</option>
+    <option value="975">975 RP</option>
+    <option value="1350">1350 RP</option>
+    <option value="1820">1820 RP</option>
+    <option value="3250">3250 RP</option>
+    <option value="na">Niedostępny</option>
+    <option value="bp">Battle Pass</option>
+    <option value="me">Mityczna esencja</option>
+  </select>
+  <select class="filter-sel" id="filter-owned" onchange="renderAll()">
+    <option value="">Wszystkie</option>
+    <option value="owned">Posiadane</option>
+    <option value="missing">Brakujące</option>
+    <option value="worlds">Worlds</option>
+  </select>
+  <button class="toggle-btn" id="group-btn" onclick="toggleGroup()">Grupuj po postaci</button>
+</div>
+
+<div class="layout">
+  <div class="champ-sidebar" id="champ-sidebar"></div>
+  <div class="skin-area" id="skin-area"></div>
+</div>
+
+<!-- ADD/EDIT SKIN MODAL -->
+<div class="overlay" id="ov-skin">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="skin-modal-title">DODAJ SKIN</div>
+      <button class="modal-x" onclick="closeModal('ov-skin')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fg">
+        <label class="fl">Nazwa skina</label>
+        <input class="fi" id="s-name" placeholder="np. Star Guardian Ahri">
+      </div>
+      <div class="fg">
+        <label class="fl">Postać</label>
+        <input class="cp-search" id="cp-search" placeholder="Szukaj postaci…" oninput="filterChampPicker()">
+        <div class="champ-picker" id="champ-picker"></div>
+        <input type="hidden" id="s-champ">
+      </div>
+      <div class="fg">
+        <label class="fl">Rzadkość</label>
+        <div class="rarity-picker" id="rarity-picker"></div>
+        <input type="hidden" id="s-rarity">
+      </div>
+      <div class="fg">
+        <label class="fl">Cena</label>
+        <select class="fs" id="s-price">
+          <option value="390">390 RP – Zwykły</option>
+          <option value="520">520 RP – Zwykły</option>
+          <option value="750">750 RP – Zwykły</option>
+          <option value="975" selected>975 RP – Zwykły</option>
+          <option value="1350">1350 RP – Epicki</option>
+          <option value="1820">1820 RP – Legendarny</option>
+          <option value="3250">3250 RP – Ultimate</option>
+          <option value="na">Niedostępny (legacy/vault)</option>
+          <option value="bp">Battle Pass</option>
+          <option value="me">Mityczna esencja</option>
+        </select>
+      </div>
+      <label class="owned-toggle" id="owned-toggle" for="s-owned" onclick="toggleOwned()">
+        <input type="checkbox" id="s-owned">
+        <div>
+          <div class="owned-toggle-label">✓ Posiadam ten skin</div>
+          <div style="font-size:0.72em;color:var(--muted);margin-top:1px">Zaznacz jeśli masz go w kolekcji</div>
+        </div>
+      </label>
+      <label class="owned-toggle" id="worlds-toggle" for="s-worlds" onclick="toggleWorlds()" style="margin-top:8px;border-color:rgba(250,215,80,0.25);">
+        <input type="checkbox" id="s-worlds" style="accent-color:#fad750;">
+        <div>
+          <div class="owned-toggle-label" style="color:#fad750;">🏆 Skin Worlds</div>
+          <div style="font-size:0.72em;color:var(--muted);margin-top:1px">Skin upamiętniający zwycięzców Worlds</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" id="delete-skin-btn" style="color:var(--red);border-color:rgba(255,78,78,0.3);display:none" onclick="deleteSkin()">Usuń</button>
+      <button class="btn" onclick="closeModal('ov-skin')">Anuluj</button>
+      <button class="btn btn-gold" onclick="confirmSkin()">Zapisz</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════
+// CHAMPIONS
+// ══════════════════════════════
+const CHAMPIONS = [
+  "Aatrox","Ahri","Akali","Akshan","Alistar","Ambessa","Amumu","Anivia","Annie","Aphelios",
+  "Ashe","Aurelion Sol","Aurora","Azir","Bard","Bel'Veth","Blitzcrank","Brand","Braum","Briar",
+  "Caitlyn","Camille","Cassiopeia","Cho'Gath","Corki","Darius","Diana","Draven","Dr. Mundo",
+  "Ekko","Elise","Evelynn","Ezreal","Fiddlesticks","Fiora","Fizz","Galio","Gangplank","Garen",
+  "Gnar","Gragas","Graves","Gwen","Hecarim","Heimerdinger","Hwei","Illaoi","Irelia","Ivern",
+  "Janna","Jarvan IV","Jax","Jayce","Jhin","Jinx","Kai'Sa","Kalista","Karma","Karthus",
+  "Kassadin","Katarina","Kayle","Kayn","Kennen","Kha'Zix","Kindred","Kled","Kog'Maw","K'Sante",
+  "LeBlanc","Lee Sin","Leona","Lilia","Lissandra","Lucian","Lulu","Lux","Malphite","Malzahar",
+  "Maokai","Master Yi","Mel","Milio","Miss Fortune","Mordekaiser","Morgana","Naafiri","Nami",
+  "Nasus","Nautilus","Neeko","Nidalee","Nilah","Nocturne","Nunu & Willump","Olaf","Orianna",
+  "Ornn","Pantheon","Poppy","Pyke","Qiyana","Quinn","Rakan","Rammus","Rek'Sai","Rell",
+  "Renata Glasc","Renekton","Rengar","Riven","Rumble","Ryze","Samira","Sejuani","Senna",
+  "Seraphine","Sett","Shaco","Shen","Shyvana","Singed","Sion","Sivir","Skarner","Smolder",
+  "Sona","Soraka","Swain","Sylas","Syndra","Tahm Kench","Taliyah","Talon","Taric","Teemo",
+  "Thresh","Tristana","Trundle","Tryndamere","Twisted Fate","Twitch","Udyr","Urgot","Varus",
+  "Vayne","Veigar","Vel'Koz","Vex","Vi","Viego","Viktor","Vladimir","Volibear","Warwick",
+  "Wukong","Xayah","Xerath","Xin Zhao","Yasuo","Yone","Yorick","Yunara","Yuumi","Zaahen",
+  "Zac","Zed","Zeri","Ziggs","Zilean","Zoe","Zyra"
+];
+
+const RARITY_DATA = {
+  common:     {label:'Zwykły',     color:'var(--r-common)',      bg:'rgba(138,155,176,0.12)'},
+  epic:       {label:'Epicki',     color:'var(--r-epic)',        bg:'rgba(30,144,255,0.12)'},
+  legendary:  {label:'Legendarny', color:'var(--r-legendary)',   bg:'rgba(232,64,64,0.12)'},
+  mythic:     {label:'Mityczny',   color:'var(--r-mythic)',      bg:'rgba(168,85,247,0.12)'},
+  ultimate:   {label:'Ultimate',   color:'var(--r-ultimate)',    bg:'rgba(244,197,80,0.12)'},
+  exalted:    {label:'Exalted',    color:'var(--r-exalted)',     bg:'rgba(126,200,126,0.12)'},
+  transcended:{label:'Transcended',color:'var(--r-transcended)', bg:'rgba(184,169,232,0.12)'}
+};
+
+const PRICE_ORDER={'390':1,'520':2,'750':3,'975':4,'1350':5,'1820':6,'3250':7,'2775':7,'me':8,'bp':8,'na':9};
+
+function sortSkins(arr){
+  return [...arr].sort((a,b)=>{
+    if(a.owned!==b.owned) return a.owned?-1:1;
+    return (PRICE_ORDER[a.price]||5)-(PRICE_ORDER[b.price]||5);
+  });
+}
+
+const PRICE_LABELS = {
+  '390':'390 RP','520':'520 RP','750':'750 RP','975':'975 RP',
+  '1350':'1350 RP','1820':'1820 RP','3250':'3250 RP',
+  'na':'Vault','bp':'Battle Pass','me':'Mit. Esencja'
+};
+
+function getRiotName(name){
+  let r=name.replace(/[\s'.\-&]/g,'').replace(/[^a-zA-Z0-9]/g,'');
+  const map={
+    "AurelionSol":"AurelionSol",
+    "BelVeth":"Belveth",
+    "ChoGath":"Chogath",
+    "DrMundo":"DrMundo",
+    "JarvanIV":"JarvanIV",
+    "KaiSa":"Kaisa",
+    "KhazIx":"Khazix",
+    "KhaZix":"Khazix",
+    "KogMaw":"KogMaw",
+    "KSante":"KSante",
+    "LeBlanc":"Leblanc",
+    "LeeSin":"LeeSin",
+    "Lilia":"Lillia",
+    "MasterYi":"MasterYi",
+    "MissFortune":"MissFortune",
+    "NunuWillump":"Nunu",
+    "RekSai":"RekSai",
+    "RenataGlasc":"Renata",
+    "TahmKench":"TahmKench",
+    "TwistedFate":"TwistedFate",
+    "VelKoz":"Velkoz",
+    "XinZhao":"XinZhao",
+    "Wukong":"MonkeyKing",
+    "Yunara":"Yunara",
+    "Zaahen":"Zaahen",
+  };
+  return map[r]||r;
+}
+
+function champIconUrl(name){
+  return `https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/${getRiotName(name)}.png`;
+}
+
+
+// ══════════════════════════════
+// SPLASH ART
+// ══════════════════════════════
+const splashCache = {}; // {champKey: [{id, name, num}]}
+
+async function loadSplashData(champName){
+  const key = getRiotName(champName);
+  if(splashCache[key]) return splashCache[key];
+  try{
+    const r = await fetch(`https://ddragon.leagueoflegends.com/cdn/16.9.1/data/en_US/champion/${key}.json`);
+    const data = await r.json();
+    const skins = data.data[key].skins;
+    splashCache[key] = skins; // [{id, num, name}]
+    return skins;
+  } catch(e){ return null; }
+}
+
+function splashUrl(champName, skinName){
+  const key = getRiotName(champName);
+  const cached = splashCache[key];
+  if(!cached) return '';
+  // szukaj po nazwie (case-insensitive), fallback na num 0
+  const clean = skinName.toLowerCase().replace(/[^a-z0-9]/g,'');
+  const match = cached.find(s=>{
+    const sn = s.name.toLowerCase().replace(/[^a-z0-9]/g,'');
+    return sn===clean || sn.includes(clean) || clean.includes(sn);
+  });
+  const num = match ? match.num : 0;
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${key}_${num}.jpg`;
+}
+
+// preload splashów dla wszystkich championów z skinami
+function preloadSplashes(){
+  const champs = [...new Set(state.skins.map(s=>s.champ))];
+  champs.forEach(c => loadSplashData(c));
+}
+
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+const SK='skin_vault_v1';
+let state={skins:[]};
+
+let editSkinId=null;
+let selectedChamp=null;
+let selectedRarityModal=null;
+let groupByChamp=true;
+let activeFilterChamp='all';
+
+function save(){localStorage.setItem(SK,JSON.stringify(state));}
+function load(){
+  const s=localStorage.getItem(SK);
+  if(s){try{const p=JSON.parse(s);if(p&&Array.isArray(p.skins))state.skins=p.skins;}catch(e){}}
+}
+
+// ══════════════════════════════
+// RENDER
+// ══════════════════════════════
+function renderAll(){
+  renderStatsBar();
+  renderChampSidebar();
+  renderSkins();
+}
+
+function renderStatsBar(){
+  const total=state.skins.length;
+  const owned=state.skins.filter(s=>s.owned).length;
+  const pct=total?Math.round(owned/total*100):0;
+  const byRarity={};
+  state.skins.filter(s=>s.owned).forEach(s=>{byRarity[s.rarity]=(byRarity[s.rarity]||0)+1;});
+
+  let html=`
+    <div class="stat-chip owned-pct"><div class="stat-chip-val">${owned}/${total}</div><div class="stat-chip-label">Posiadane</div></div>
+    <div class="stat-chip"><div class="stat-chip-val">${pct}%</div><div class="stat-chip-label">Kompletność</div></div>
+    <div class="stat-chip"><div class="stat-chip-val">${[...new Set(state.skins.filter(s=>s.owned).map(s=>s.champ))].length}</div><div class="stat-chip-label">Postaci ze skinem</div></div>
+  `;
+  Object.entries(RARITY_DATA).forEach(([key,rd])=>{
+    const cnt=byRarity[key]||0;
+    if(cnt>0) html+=`<div class="stat-chip"><div class="stat-chip-val" style="color:${rd.color}">${cnt}</div><div class="stat-chip-label" style="color:${rd.color}">${rd.label}</div></div>`;
+  });
+  document.getElementById('stats-bar').innerHTML=html;
+}
+
+function renderChampSidebar(){
+  const champsWithSkins=[...new Set(state.skins.map(s=>s.champ))].sort((a,b)=>a.localeCompare(b,'pl'));
+  let html=`<div class="champ-sidebar-hd"><span>Postacie</span><span class="champ-count">${champsWithSkins.length}</span></div>`;
+  html+=`<div class="champ-item all-item ${activeFilterChamp==='all'?'active':''}" data-champ="all"><span>Wszystkie postacie</span></div>`;
+  champsWithSkins.forEach(c=>{
+    const total=state.skins.filter(s=>s.champ===c).length;
+    const owned=state.skins.filter(s=>s.champ===c&&s.owned).length;
+    html+=`<div class="champ-item ${activeFilterChamp===c?'active':''}" data-champ="${c.replace(/'/g,'&apos;')}">
+      <img class="champ-icon" src="${champIconUrl(c)}" alt="" onerror="this.style.display='none'">
+      <span class="champ-name-sidebar">${c}</span>
+      <span class="champ-own-count">${owned}/${total}</span>
+    </div>`;
+  });
+  document.getElementById('champ-sidebar').innerHTML=html;
+
+  // delegacja eventów
+  document.getElementById('champ-sidebar').onclick=function(e){
+    const item=e.target.closest('.champ-item');
+    if(!item) return;
+    setChampFilter(item.dataset.champ);
+  };
+}
+
+function setChampFilter(c){
+  activeFilterChamp=c;
+  renderAll();
+}
+
+function getFilteredSkins(){
+  const q=document.getElementById('search-box').value.toLowerCase();
+  const rarity=document.getElementById('filter-rarity').value;
+  const price=document.getElementById('filter-price').value;
+  const owned=document.getElementById('filter-owned').value;
+
+  return state.skins.filter(s=>{
+    if(activeFilterChamp!=='all'&&s.champ!==activeFilterChamp)return false;
+    if(q&&!s.name.toLowerCase().includes(q)&&!s.champ.toLowerCase().includes(q))return false;
+    if(rarity&&s.rarity!==rarity)return false;
+    if(price&&s.price!==price)return false;
+    if(owned==='owned'&&!s.owned)return false;
+    if(owned==='missing'&&s.owned)return false;
+    if(owned==='worlds'&&!s.worlds)return false;
+    return true;
+  });
+}
+
+function renderSkins(){
+  const el=document.getElementById('skin-area');
+  const skins=getFilteredSkins();
+
+  if(!skins.length){
+    el.innerHTML='<div class="empty">Brak skinów spełniających kryteria.<br>Kliknij "+ Dodaj skin" żeby zacząć.</div>';
+    return;
+  }
+
+  if(groupByChamp){
+    const byChamp={};
+    skins.forEach(s=>{if(!byChamp[s.champ])byChamp[s.champ]=[];byChamp[s.champ].push(s);});
+    const sorted=Object.entries(byChamp).sort(([a],[b])=>a.localeCompare(b,'pl'));
+    el.innerHTML=sorted.map(([champ,cs])=>{
+      const sortedCs=sortSkins(cs);
+      const owned=cs.filter(s=>s.owned).length;
+      return`<div class="champ-section">
+        <div class="champ-section-hd">
+          <img class="champ-section-icon" src="${champIconUrl(champ)}" alt="" onerror="this.style.display='none'">
+          <div class="champ-section-name">${champ}</div>
+          <div class="champ-section-stats">${owned}/${cs.length} posiadane</div>
+        </div>
+        <div class="skin-grid">${sortedCs.map(s=>skinCardHTML(s)).join('')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    el.innerHTML=`<div class="skin-grid">${sortSkins(skins).map(s=>skinCardHTML(s)).join('')}</div>`;
+  }
+}
+
+function skinCardHTML(s){
+  const rd=RARITY_DATA[s.rarity]||RARITY_DATA.common;
+  const unavail=s.price==='na';
+  let cls=`skin-card rarity-${s.rarity||'common'}`;
+  if(s.owned) cls+=' owned';
+  if(unavail) cls+=' unavailable';
+  if(s.worlds) cls+=' worlds';
+
+  // splash art – loading art (portrait format, lepszy niż splash)
+  const key=getRiotName(s.champ);
+  const cached=splashCache[key];
+  let imgHTML;
+  if(cached){
+    const splashSrc=splashUrl(s.champ,s.name);
+    imgHTML=`<img class="skin-splash" src="${splashSrc}" alt="" loading="lazy"
+      onerror="this.outerHTML='<div class=skin-splash-placeholder>✨</div>'"
+      style="aspect-ratio:3/4;object-fit:cover;object-position:top">`;
+  } else {
+    imgHTML=`<div class="skin-splash-placeholder">✨</div>`;
+    // załaduj w tle i odśwież kartę
+    if(s.champ) loadSplashData(s.champ).then(()=>{ renderSkins(); });
+  }
+
+  return`<div class="${cls}" onclick="openEditSkin('${s.id}')">
+    ${s.worlds?'<div class="worlds-badge">Worlds</div>':''}
+    ${imgHTML}
+    <div class="skin-info">
+      <div class="skin-name">${s.name}</div>
+      <div class="skin-meta">
+        <span class="rarity-badge r-${s.rarity}" style="color:${rd.color}">${rd.label}</span>
+        <span class="price-tag">${PRICE_LABELS[s.price]||s.price}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleGroup(){
+  groupByChamp=!groupByChamp;
+  const btn=document.getElementById('group-btn');
+  btn.classList.toggle('active',groupByChamp);
+  renderSkins();
+}
+
+// ══════════════════════════════
+// CHAMP PICKER (modal)
+// ══════════════════════════════
+function buildChampPicker(){
+  const q=document.getElementById('cp-search').value.toLowerCase();
+  const filtered=CHAMPIONS.filter(c=>c.toLowerCase().includes(q));
+  const selected=document.getElementById('s-champ').value;
+  document.getElementById('champ-picker').innerHTML=filtered.map(c=>`
+    <div class="cp-item${selected===c?' selected':''}" data-champ="${c.replace(/'/g,'&apos;')}">
+      <img class="cp-icon" src="${champIconUrl(c)}" alt="" onerror="this.style.display='none'">
+      <div class="cp-name">${c}</div>
+    </div>`).join('');
+
+  // delegacja eventów zamiast inline onclick
+  const picker = document.getElementById('champ-picker');
+  picker.onclick = function(e){
+    const item = e.target.closest('.cp-item');
+    if(!item) return;
+    const champ = item.dataset.champ;
+    document.getElementById('s-champ').value = champ;
+    buildChampPicker();
+  };
+}
+
+function filterChampPicker(){buildChampPicker();}
+
+// ══════════════════════════════
+// RARITY PICKER (modal)
+// ══════════════════════════════
+function buildRarityPicker(){
+  const sel=document.getElementById('s-rarity').value;
+  document.getElementById('rarity-picker').innerHTML=Object.entries(RARITY_DATA).map(([key,rd])=>`
+    <div class="rp-item${sel===key?' selected':''}" style="color:${rd.color};border-color:${rd.color};background:${sel===key?rd.bg:'transparent'}"
+      onclick="selectRarity('${key}')">
+      ${rd.label}
+    </div>`).join('');
+}
+
+function selectRarity(key){
+  document.getElementById('s-rarity').value=key;
+  // auto-set price hint
+  const priceMap={common:'975',epic:'1350',legendary:'1820',mythic:'me',ultimate:'3250',exalted:'me',transcended:'me'};
+  if(priceMap[key]) document.getElementById('s-price').value=priceMap[key];
+  buildRarityPicker();
+}
+
+// ══════════════════════════════
+// ADD / EDIT SKIN
+// ══════════════════════════════
+function openAddSkin(){
+  editSkinId=null;
+  document.getElementById('skin-modal-title').textContent='DODAJ SKIN';
+  document.getElementById('s-name').value='';
+  document.getElementById('s-champ').value='';
+  document.getElementById('s-rarity').value='';
+  document.getElementById('s-price').value='975';
+  document.getElementById('s-owned').checked=false;
+  document.getElementById('owned-toggle').classList.remove('active');
+  document.getElementById('s-worlds').checked=false;
+  const wt=document.getElementById('worlds-toggle');
+  wt.style.borderColor='rgba(250,215,80,0.25)';wt.style.background='';
+  document.getElementById('delete-skin-btn').style.display='none';
+  document.getElementById('cp-search').value='';
+  buildChampPicker();
+  buildRarityPicker();
+  openModal('ov-skin');
+}
+
+function openEditSkin(id){
+  const s=state.skins.find(x=>x.id===id);if(!s)return;
+  editSkinId=id;
+  document.getElementById('skin-modal-title').textContent='EDYTUJ SKIN';
+  document.getElementById('s-name').value=s.name;
+  document.getElementById('s-champ').value=s.champ;
+  document.getElementById('s-rarity').value=s.rarity||'';
+  document.getElementById('s-price').value=s.price||'975';
+  document.getElementById('s-owned').checked=!!s.owned;
+  document.getElementById('owned-toggle').classList.toggle('active',!!s.owned);
+  document.getElementById('s-worlds').checked=!!s.worlds;
+  const wt2=document.getElementById('worlds-toggle');
+  wt2.style.borderColor=s.worlds?'rgba(250,215,80,0.6)':'rgba(250,215,80,0.25)';
+  wt2.style.background=s.worlds?'rgba(250,215,80,0.08)':'';
+  document.getElementById('delete-skin-btn').style.display='block';
+  document.getElementById('cp-search').value='';
+  buildChampPicker();
+  buildRarityPicker();
+  openModal('ov-skin');
+}
+
+function toggleOwned(){
+  const cb=document.getElementById('s-owned');
+  cb.checked=!cb.checked;
+  document.getElementById('owned-toggle').classList.toggle('active',cb.checked);
+}
+
+function toggleWorlds(){
+  const cb=document.getElementById('s-worlds');
+  cb.checked=!cb.checked;
+  const toggle=document.getElementById('worlds-toggle');
+  toggle.style.borderColor=cb.checked?'rgba(250,215,80,0.6)':'rgba(250,215,80,0.25)';
+  toggle.style.background=cb.checked?'rgba(250,215,80,0.08)':'';
+}
+
+function confirmSkin(){
+  const name=document.getElementById('s-name').value.trim();
+  const champ=document.getElementById('s-champ').value;
+  const rarity=document.getElementById('s-rarity').value;
+  if(!name){showToast('⚠ Wpisz nazwę skina');return;}
+  if(!champ){showToast('⚠ Wybierz postać');return;}
+  if(!rarity){showToast('⚠ Wybierz rzadkość');return;}
+
+  const skin={
+    id:editSkinId||'sk'+Date.now(),
+    name,champ,rarity,
+    price:document.getElementById('s-price').value,
+    owned:document.getElementById('s-owned').checked,
+    worlds:document.getElementById('s-worlds').checked
+  };
+
+  if(editSkinId){
+    const i=state.skins.findIndex(x=>x.id===editSkinId);
+    if(i>=0)state.skins[i]=skin;
+    showToast('✓ Zaktualizowano: '+name);
+  } else {
+    state.skins.push(skin);
+    showToast('✓ Dodano: '+name);
+  }
+  save();renderAll();closeModal('ov-skin');
+}
+
+function deleteSkin(){
+  const s=state.skins.find(x=>x.id===editSkinId);
+  if(!confirm(`Usunąć skin "${s?.name}"?`))return;
+  state.skins=state.skins.filter(x=>x.id!==editSkinId);
+  save();renderAll();closeModal('ov-skin');
+  showToast('Usunięto skin');
+}
+
+// ══════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════
+function exportData(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));
+  a.download=`skin_vault_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();showToast('📤 Wyeksportowano');
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(Array.isArray(p.skins))state.skins=p.skins;
+      save();renderAll();showToast('📥 Import OK!');
+    }catch{showToast('❌ Błąd importu');}
+  };
+  r.readAsText(f);e.target.value='';
+}
+
+// ══════════════════════════════
+// UTILS
+// ══════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+});
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+load();
+preloadSplashes();
+// set group btn state
+document.getElementById('group-btn').classList.add('active');
+renderAll();
+</script>
+</body>
+</html>
