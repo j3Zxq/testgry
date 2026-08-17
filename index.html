@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<!-- Biblioteka Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // Wpisz tutaj swoje dane z Supabase (Project Settings -> API)
+    const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c
+';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Funkcja sprawdzająca czy użytkownik jest zalogowany
+    async function checkAuth() {
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        // Jeśli nie ma sesji (nie jesteś zalogowany), przekieruj do logowania
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+    }
+
+    // Wywołaj sprawdzenie od razu przy ładowaniu strony
+    checkAuth();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEXUS</title>
@@ -483,23 +506,6 @@ body::after {
   .keyboard-hint { display: none; }
 }
 </style>
-<!-- Biblioteka Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-    const supabaseUrl = 'TWÓJ_PROJECT_URL';
-    const supabaseKey = 'TWÓJ_PROJECT_ANON_KEY';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    async function protectRoute() {
-        const { data: { session } } = await _supabase.auth.getSession();
-        // Jeśli brak sesji i nie jesteśmy na stronie logowania, wyrzuć do logowania
-        if (!session && !window.location.pathname.endsWith('login.html')) {
-            window.location.href = 'login.html';
-        }
-    }
-    protectRoute();
-</script>
 </head>
 <body>
 <img class="bg-watermark" src="akatsuki_logo.png" alt="" aria-hidden="true">
