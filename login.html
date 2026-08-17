@@ -2,29 +2,43 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Logowanie – Panel Gier</title>
-    <!-- Biblioteka Supabase -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie – NEXUS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #0a0a0a; color: #e8e8e8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #111; padding: 30px; border: 1px solid #333; border-radius: 8px; width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #b30000; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #cc1a1a; }
+        p { font-size: 0.9em; text-align: center; }
+        a { color: #b30000; text-decoration: none; }
+    </style>
 </head>
 <body>
-    <h2>Logowanie do Systemu</h2>
-    <form id="login-form">
-        <input type="email" id="email" placeholder="E-mail" required><br><br>
-        <input type="password" id="password" placeholder="Hasło" required><br><br>
-        <button type="submit">Zaloguj</button>
-    </form>
-    <p id="error-message" style="color: red;"></p>
-<p>Nie masz konta? <a href="register.html">Zarejestruj się</a></p>
+
+    <div class="box">
+        <h2>Logowanie</h2>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="password" placeholder="Hasło" required>
+            <button type="submit">Zaloguj</button>
+        </form>
+        <p id="error-message" style="color: #ff5555; margin-top: 10px;"></p>
+        <p>Nie masz konta? <a href="register.html">Zarejestruj się</a></p>
+    </div>
+
     <script>
-        // Inicjalizacja Supabase
-        const supabaseUrl = 'TWÓJ_PROJECT_URL';
-        const supabaseKey = 'TWÓJ_PROJECT_ANON_KEY';
+        const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errEl = document.getElementById('error-message');
+            errEl.textContent = 'Logowanie...';
 
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: email,
@@ -32,10 +46,10 @@
             });
 
             if (error) {
-                document.getElementById('error-message').textContent = 'Błąd logowania: ' + error.message;
+                errEl.textContent = 'Błąd: ' + error.message;
             } else {
-                // Po udanym logowaniu przekierowuje do głównego huba
-                window.location.href = 'hub.html';
+                // Sukces – wymuś pełne przekierowanie
+                window.location.replace('index.html');
             }
         });
     </script>
