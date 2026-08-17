@@ -11,9 +11,13 @@
     /* Ukrywamy ciało strony na start, żeby nie mrugnęła */
     body { display: none; background: #0a0a0a; color: #fff; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    body { display: none; background: #0a0a0a; color: #fff; }
+</style>
 <script>
     const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIxlvcmUiOiJhbm9uIiwiaWF0IjoxNzg2OTg0ODQ3LCJleHAiOjIxMDI1NjA4NDd9.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     async function checkAuth() {
@@ -21,27 +25,16 @@
             const { data: { session }, error } = await _supabase.auth.getSession();
             
             if (error || !session) {
-                // Brak sesji -> przejdź do logowania
                 window.location.replace('login.html');
             } else {
-                // Jest sesja -> pokaż stronę
                 document.body.style.display = 'block';
             }
         } catch (err) {
-            // Awaryjne przekierowanie w razie błędu sieci
             window.location.replace('login.html');
         }
     }
 
-    // Uruchom sprawdzenie sesji natychmiast
     checkAuth();
-
-    // Awaryjny mechanizm (timeout): jeśli zapytanie wisiałoby dłużej niż 3 sekundy, pokaż stronę lub przekieruj
-    setTimeout(() => {
-        if (document.body.style.display !== 'block') {
-            document.body.style.display = 'block';
-        }
-    }, 3000);
 </script>
 
     <link rel="icon" type="image/png" sizes="32x32" href="akatsuki_logo.png">
