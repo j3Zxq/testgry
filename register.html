@@ -2,44 +2,60 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Rejestracja – Panel Gier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja – NEXUS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #0a0a0a; color: #e8e8e8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #111; padding: 30px; border: 1px solid #333; border-radius: 8px; width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #b30000; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #cc1a1a; }
+        p { font-size: 0.9em; text-align: center; }
+        a { color: #b30000; text-decoration: none; }
+    </style>
 </head>
 <body>
-    <h2>Rejestracja Konta</h2>
-    <form id="register-form">
-        <input type="email" id="reg-email" placeholder="E-mail" required><br><br>
-        <input type="password" id="reg-password" placeholder="Hasło (min. 6 znaków)" required><br><br>
-        <button type="submit">Zarejestruj się</button>
-    </form>
-    <p id="reg-message" style="color: green;"></p>
-    <p>Masz już konto? <a href="login.html">Zaloguj się</a></p>
+
+    <div class="box">
+        <h2>Rejestracja</h2>
+        <form id="register-form">
+            <input type="email" id="reg-email" placeholder="E-mail" required>
+            <input type="password" id="reg-password" placeholder="Hasło (min. 6 znaków)" required>
+            <button type="submit">Zarejestruj się</button>
+        </form>
+        <p id="reg-message" style="margin-top: 10px;"></p>
+        <p>Masz już konto? <a href="login.html">Zaloguj się</a></p>
+    </div>
 
     <script>
-        const supabaseUrl = 'TWÓJ_PROJECT_URL';
-        const supabaseKey = 'TWÓJ_PROJECT_ANON_KEY';
+        const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const msgElement = document.getElementById('reg-message');
+            
+            msgElement.style.color = '#e8e8e8';
+            msgElement.textContent = 'Tworzenie konta...';
 
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
                 password: password,
             });
 
-            const msgElement = document.getElementById('reg-message');
             if (error) {
-                msgElement.style.color = 'red';
-                msgElement.textContent = 'Błąd rejestracji: ' + error.message;
+                msgElement.style.color = '#ff5555';
+                msgElement.textContent = 'Błąd: ' + error.message;
             } else {
-                msgElement.style.color = 'green';
-                msgElement.textContent = 'Konto utworzone! Możesz się teraz zalogować.';
+                msgElement.style.color = '#00c853';
+                msgElement.textContent = 'Konto utworzone! Przekierowanie...';
                 setTimeout(() => {
                     window.location.href = 'login.html';
-                }, 2000);
+                }, 1500);
             }
         });
     </script>
