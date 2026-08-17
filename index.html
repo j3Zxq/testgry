@@ -5,38 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS</title>
     
-    <!-- ZABEZPIECZENIE SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Ukrywamy ciało strony na start, żeby zapobiec mignięciu treści przed autoryzacją */
         body { display: none; background: #0a0a0a; color: #fff; }
     </style>
     <script>
         const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: { persistSession: true, autoRefreshToken: true }
+        });
 
-        async function checkAuth() {
-            try {
-                // Pobieramy aktywną sesję użytkownika z localStorage / ciasteczek Supabase
-                const { data: { session }, error } = await _supabase.auth.getSession();
-                
-                if (error || !session) {
-                    // Brak sesji – natychmiastowe przekierowanie do logowania
-                    window.location.replace('login.html');
-                } else {
-                    // Jest sesja – odblokowujemy widoczność strony
-                    document.body.style.display = 'block';
+        async function verifyAccess() {
+            // Sprawdzamy sesję bezpośrednio z klienta Supabase
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            if (!session) {
+                // Jeśli nadal brak, sprawdzamy czy w localStorage jest jakikolwiek klucz supabase (zapobiega fałszywym odrzuceniom)
+                let foundToken = false;
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes('supabase.auth.token')) {
+                        foundToken = true;
+                        break;
+                    }
                 }
-            } catch (err) {
-                window.location.replace('login.html');
+                
+                if (!foundToken) {
+                    window.location.replace('login.html');
+                    return;
+                }
             }
+            
+            // Odblokowujemy widok strony
+            document.body.style.display = 'block';
         }
 
-        // Uruchomienie procedury weryfikacji
-        checkAuth();
+        verifyAccess();
 
-        // Funkcja wylogowania powiązana z przyciskiem w nagłówku
         async function logout() {
             await _supabase.auth.signOut();
             window.location.replace('login.html');
@@ -50,7 +56,6 @@
         :root { --black: #0a0a0a; --black2: #111111; --black3: #1a1a1a; --red: #8b0000; --red2: #b30000; --red3: #cc1a1a; --coal: #2a2a2a; --coal2: #383838; --text: #e8e8e8; --muted: rgba(232,232,232,0.38); --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12); }
         html, body { height: 100%; background: var(--black); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
         body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.5; }
-        body::after { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 9998; }
         .bg-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45vw; max-width: 600px; opacity: 0.08; pointer-events: none; z-index: 0; }
         .hub { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
         .header { display: flex; align-items: center; justify-content: space-between; padding: 22px 40px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
@@ -62,16 +67,6 @@
         .header-right { display: flex; align-items: center; gap: 20px; font-family: 'Rajdhani', sans-serif; font-size: 0.75em; color: var(--muted); }
         .logout-btn { cursor: pointer; background: var(--red); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-family: 'Rajdhani'; }
         .carousel-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; background: rgba(26,26,26,0.9); border: 1px solid var(--border2); color: var(--muted); cursor: pointer; z-index: 20; clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%); }
-        .arrow-left { left: 40px; } .arrow-right { right: 40px; clip-path: polygon(0% 0%, 90% 0%, 100% 100%, 10% 100%); }
-        .card-track { position: relative; width: 100%; }
-        .card { position: absolute; top: 50%; left: 50%; width: 420px; height: 500px; cursor: pointer; transition: transform 0.55s; }
-        .card-inner { width: 100%; height: 100%; background: var(--black2); border: 1px solid var(--border); display: flex; flex-direction: column; }
-        .dots { display: flex; justify-content: center; gap: 8px; padding: 0 0 28px; }
-        .dot { width: 6px; height: 6px; background: var(--coal2); border-radius: 1px; }
-        .dot.active { background: var(--red2); width: 24px; }
-        .progress-bar { height: 1px; background: var(--border); margin: 0 40px; }
-        .progress-fill { height: 1px; background: var(--red); transition: width 0.55s; }
     </style>
 </head>
 <body>
@@ -91,35 +86,8 @@
     </div>
   </header>
   <div class="carousel-area">
-    <button class="arrow arrow-left" onclick="navClick(-1)">&#8592;</button>
-    <div class="card-track" id="card-track"></div>
-    <button class="arrow arrow-right" onclick="navClick(1)">&#8594;</button>
+    <!-- Zawartość aplikacji -->
   </div>
-  <div class="dots" id="dots"></div>
-  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 </div>
-
-<script>
-    // Zegarek w nagłówku
-    function updateClock() {
-        const now = new Date();
-        const clockEl = document.getElementById('clock');
-        if (clockEl) {
-            clockEl.textContent = now.toTimeString().split(' ')[0];
-        }
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Miejsce na Twoją logikę karuzeli i kart (CARDS, buildCards itd.)
-    let currentIndex = 0;
-    const cardsData = []; // Tutaj wstaw swoje karty, jeśli były zdefiniowane osobno
-
-    function navClick(direction) {
-        // Przykładowa obsługa kliknięcia strzałek
-        currentIndex += direction;
-        // Dostosuj do swojej logiki karuzeli
-    }
-</script>
 </body>
 </html>
