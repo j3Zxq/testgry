@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<!-- Biblioteka Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
     // Wpisz tutaj swoje dane z Supabase (Project Settings -> API)
     const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c
-';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     // Funkcja sprawdzająca czy użytkownik jest zalogowany
@@ -27,6 +23,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEXUS</title>
+<style>
+    body { display: none; }
+</style>
 <link rel="icon" type="image/png" sizes="32x32" href="akatsuki_logo.png">
 <link rel="shortcut icon" type="image/png" href="akatsuki_logo.png">
 <link rel="apple-touch-icon" href="akatsuki_logo.png">
