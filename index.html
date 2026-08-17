@@ -6,42 +6,17 @@
     <title>NEXUS</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { display: none; background: #0a0a0a; color: #fff; }
-    </style>
     <script>
         const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-            auth: { persistSession: true, autoRefreshToken: true }
-        });
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function verifyAccess() {
-            // Sprawdzamy sesję bezpośrednio z klienta Supabase
-            const { data: { session } } = await _supabase.auth.getSession();
-            
+        // Błyskawiczna weryfikacja sesji w tle
+        _supabase.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                // Jeśli nadal brak, sprawdzamy czy w localStorage jest jakikolwiek klucz supabase (zapobiega fałszywym odrzuceniom)
-                let foundToken = false;
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.includes('supabase.auth.token')) {
-                        foundToken = true;
-                        break;
-                    }
-                }
-                
-                if (!foundToken) {
-                    window.location.replace('login.html');
-                    return;
-                }
+                window.location.replace('login.html');
             }
-            
-            // Odblokowujemy widok strony
-            document.body.style.display = 'block';
-        }
-
-        verifyAccess();
+        });
 
         async function logout() {
             await _supabase.auth.signOut();
@@ -86,7 +61,7 @@
     </div>
   </header>
   <div class="carousel-area">
-    <!-- Zawartość aplikacji -->
+    <!-- Zawartość panelu -->
   </div>
 </div>
 </body>
