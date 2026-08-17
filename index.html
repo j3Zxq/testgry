@@ -5,37 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS</title>
     
-    <!-- ZABEZPIECZENIE -->
+    <!-- ZABEZPIECZENIE SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-    /* Ukrywamy ciało strony na start, żeby nie mrugnęła */
-    body { display: none; background: #0a0a0a; color: #fff; }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-    body { display: none; background: #0a0a0a; color: #fff; }
-</style>
-<script>
-    const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    <style>
+        /* Ukrywamy ciało strony na start, żeby zapobiec mignięciu treści przed autoryzacją */
+        body { display: none; background: #0a0a0a; color: #fff; }
+    </style>
+    <script>
+        const supabaseUrl = 'https://truewrphbkpnsujmulrb.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydWV3cnBoYmtwbnN1am11bHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5ODQ4NDcsImV4cCI6MjEwMjU2MDg0N30.-HnuDrGB1mjHRcflFSVyFMFUw9U9NPibJNiWdSiZi2c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function checkAuth() {
-        try {
-            const { data: { session }, error } = await _supabase.auth.getSession();
-            
-            if (error || !session) {
+        async function checkAuth() {
+            try {
+                // Pobieramy aktywną sesję użytkownika z localStorage / ciasteczek Supabase
+                const { data: { session }, error } = await _supabase.auth.getSession();
+                
+                if (error || !session) {
+                    // Brak sesji – natychmiastowe przekierowanie do logowania
+                    window.location.replace('login.html');
+                } else {
+                    // Jest sesja – odblokowujemy widoczność strony
+                    document.body.style.display = 'block';
+                }
+            } catch (err) {
                 window.location.replace('login.html');
-            } else {
-                document.body.style.display = 'block';
             }
-        } catch (err) {
+        }
+
+        // Uruchomienie procedury weryfikacji
+        checkAuth();
+
+        // Funkcja wylogowania powiązana z przyciskiem w nagłówku
+        async function logout() {
+            await _supabase.auth.signOut();
             window.location.replace('login.html');
         }
-    }
-
-    checkAuth();
-</script>
+    </script>
 
     <link rel="icon" type="image/png" sizes="32x32" href="akatsuki_logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -94,8 +100,26 @@
 </div>
 
 <script>
-    // Tu pozostaw resztę swoich funkcji (CARDS, buildCards, updatePositions, itd.)
-    // ... wklej tutaj swój oryginalny kod JS od sekcji CARDS do końca pliku ...
+    // Zegarek w nagłówku
+    function updateClock() {
+        const now = new Date();
+        const clockEl = document.getElementById('clock');
+        if (clockEl) {
+            clockEl.textContent = now.toTimeString().split(' ')[0];
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Miejsce na Twoją logikę karuzeli i kart (CARDS, buildCards itd.)
+    let currentIndex = 0;
+    const cardsData = []; // Tutaj wstaw swoje karty, jeśli były zdefiniowane osobno
+
+    function navClick(direction) {
+        // Przykładowa obsługa kliknięcia strzałek
+        currentIndex += direction;
+        // Dostosuj do swojej logiki karuzeli
+    }
 </script>
 </body>
 </html>
